@@ -1,13 +1,25 @@
-#FROM adoptopenjdk:11-jre-openj9
-#FROM adoptopenjdk:11-jre-hotspot
-FROM adoptopenjdk:14.0.2_12-jdk-openj9-0.21.0
-#RUN mkdir /opt/app
-#WORKDIR /opt/app
-#copiamos archivo compilado y ejecutamos
-#COPY Prueba01.jar /opt/app
-#CMD ["java", "-jar", "/opt/app/Prueba01.jar"]
+#----Archivo dockerfile
+#--1 Crear una máquina con java y gradle
+#--2 Descargar un proyecto de java CLI de apuntes de citas entre doctores y pacientes
+#--3 Compilar proyecto
+#----Tamaño final de la imagen: 790 MB------------------
+#--------Pablo Núñez-PY--pablonunez81@gmail.com---------
+
 #-----------------------------------------
-#Para Construir:
-# >docker build -t prueba02:20210128 .
-#Para ejecutar:
-# docker run --rm -v "$(pwd):/opt/app" -w /opt/app prueba02:20210128 javac src/App.java | java src/App.java
+#Para Construir imagen:
+# >docker build -t appointments-java-cli:1 .
+
+#Descargar OS con java y gradle
+FROM gradle:jdk15-hotspot AS TEMP_BUILD_IMAGE
+
+#descargar proyecto github de Appoinments
+RUN echo "Descargando proyecto de github:"
+RUN git clone https://github.com/pablonunez81/Appointments.git Appointments
+WORKDIR /home/gradle/Appointments
+
+#compilar javac
+RUN echo "compilando:"
+RUN gradle build
+RUN echo "Compilación lista"
+
+RUN echo "..Para correr imagen: >docker run --rm -it appointments-java-cli:1 java -jar ./build/libs/Appointments-1.0.0.jar"
